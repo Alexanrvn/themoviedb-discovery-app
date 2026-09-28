@@ -5,6 +5,21 @@ import { tmdbAccessToken } from './config';
 const app = express();
 // Define the port number for the server to listen on
 const port: number = 3000;
+
+// Parse the raw response from the TMDB API
+const rawData = (await response.json()) as TmdbMoviesRawResponse;
+
+// Transform the raw data into the supported format for our application
+const data: MoviesApiResponse = {
+  page: rawData.page,
+  results: rawData.results.map(toSupportedMovie),
+  total_pages: rawData.total_pages,
+  total_results: rawData.total_results
+};
+
+// Send the transformed data as a JSON response
+res.json(data);
+
 // Define a route handler for the root URL ('/')
 app.get('/', (_req: express.Request, res: express.Response) => {
     res.send('Hello World from TypeScript!');
@@ -33,6 +48,8 @@ app.get('/api/health', (_req: express.Request, res: express.Response) => {
   const response: { status: string } = { status: 'ok' };
   res.json(response);
 });
+
+
 
 // Start the server and listen on the specified port
 app.listen(port, () => {
