@@ -7,7 +7,7 @@
   "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
   "dev:client": "vite",
   "dev:server": "tsx watch src/back-end/index.ts"
-}
+},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Alexanrvn/themoviedb-discovery-app.git"
