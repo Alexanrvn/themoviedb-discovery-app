@@ -1,5 +1,6 @@
 import express from 'express';
 import { tmdbAccessToken } from './config';
+import { DEFAULT_LANGUAGE, DEFAULT_PAGE, DEFAULT_REGION } from './constants';
 import type {
   TmdbMoviesRawResponse,
   MoviesApiResponse,
@@ -27,12 +28,20 @@ app.get(
   '/api/movies/popular',
   async (_req: express.Request, res: express.Response) => {
     try {
+      const queryParams = new URLSearchParams();
+      const { language, page, region } = _req.query;
+
+      queryParams.append('language', (language as string) || DEFAULT_LANGUAGE);
+      queryParams.append('page', (page as string) || DEFAULT_PAGE);
+      queryParams.append('region', (region as string) || DEFAULT_REGION);
+
+      // L'URL DOIT contenir queryParams.toString() :
       const response = await fetch(
-        'https://api.themoviedb.org/3/movie/popular',
+        `https://api.themoviedb.org/3/movie/popular?${queryParams.toString()}`,
         {
           headers: {
             Authorization: `Bearer ${tmdbAccessToken}`,
-            'Content-Type': 'application/json;charset=utf-8',
+            'Content-Type': 'application/json; charset=utf-8',
           },
         },
       );
@@ -43,10 +52,8 @@ app.get(
         );
       }
 
-      // Parse the raw response from the TMDB API
       const rawData = (await response.json()) as TmdbMoviesRawResponse;
 
-      // Transform the raw data into the supported format for our application
       const data: MoviesApiResponse = {
         page: rawData.page,
         results: rawData.results.map(toSupportedMovie),
@@ -54,7 +61,6 @@ app.get(
         total_results: rawData.total_results,
       };
 
-      // Send the transformed data as a JSON response
       res.json(data);
     } catch (error) {
       console.error('Error fetching popular movies:', error);
