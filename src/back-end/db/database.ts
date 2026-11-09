@@ -22,18 +22,17 @@ export function initDatabase(dbPath: string = DEFAULT_DB_PATH): DatabaseSync {
   // Exécution dans une transaction atomic pour rollback sur erreur
   db.exec('BEGIN TRANSACTION;');
   try {
-    db.exec(`
-      CREATE TABLE IF NOT EXISTS genre (
+    db.exec(`CREATE TABLE IF NOT EXISTS genre (
         id_tmdb INTEGER PRIMARY KEY,
         name TEXT NOT NULL
-      );
+      );`);
 
-      CREATE TABLE IF NOT EXISTS country (
+    db.exec(`CREATE TABLE IF NOT EXISTS country (
         iso_code TEXT PRIMARY KEY,
         name TEXT NOT NULL
-      );
+      );`);
 
-      CREATE TABLE IF NOT EXISTS movie (
+    db.exec(`CREATE TABLE IF NOT EXISTS movie (
         id_tmdb INTEGER PRIMARY KEY,
         title TEXT NOT NULL,
         release_date TEXT,
@@ -50,20 +49,19 @@ export function initDatabase(dbPath: string = DEFAULT_DB_PATH): DatabaseSync {
         budget INTEGER CHECK (budget IS NULL OR budget > 0),
         revenue INTEGER CHECK (revenue IS NULL OR revenue > 0),
         observation_date TEXT DEFAULT CURRENT_TIMESTAMP
-      );
+      );`);
 
-      CREATE TABLE IF NOT EXISTS movie_genre (
+    db.exec(`CREATE TABLE IF NOT EXISTS movie_genre (
         movie_id INTEGER REFERENCES movie(id_tmdb) ON DELETE CASCADE,
         genre_id INTEGER REFERENCES genre(id_tmdb) ON DELETE CASCADE,
         PRIMARY KEY (movie_id, genre_id)
-      );
+      );`);
 
-      CREATE TABLE IF NOT EXISTS movie_country (
+    db.exec(`CREATE TABLE IF NOT EXISTS movie_country (
         movie_id INTEGER REFERENCES movie(id_tmdb) ON DELETE CASCADE,
         country_iso TEXT REFERENCES country(iso_code) ON DELETE CASCADE,
         PRIMARY KEY (movie_id, country_iso)
-      );
-    `);
+      );`);
 
     db.exec('COMMIT;');
   } catch (error) {
