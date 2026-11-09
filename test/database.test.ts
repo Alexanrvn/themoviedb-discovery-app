@@ -85,6 +85,18 @@ describe('Schéma SQLite et initialisation [DASHBOARD-02]', () => {
           "INSERT INTO movie_country (movie_id, country_iso) VALUES (1, 'XX');",
         );
       }).toThrow();
+      for (const [table, columns] of [
+        ['movie_genre', ['movie_id', 'genre_id']],
+        ['movie_country', ['movie_id', 'country_iso']],
+      ] as const) {
+        for (const column of columns) {
+          expect(() => {
+            db.exec(
+              `INSERT INTO ${table} (${columns.join(', ')}) VALUES (${column === columns[0] ? 'NULL, 10' : '1, NULL'});`,
+            );
+          }).toThrow();
+        }
+      }
       expect(
         (db.prepare('PRAGMA foreign_keys').get() as { foreign_keys: number })
           .foreign_keys,

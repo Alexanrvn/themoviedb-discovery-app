@@ -52,14 +52,14 @@ export function initDatabase(dbPath: string = DEFAULT_DB_PATH): DatabaseSync {
       );`);
 
     db.exec(`CREATE TABLE IF NOT EXISTS movie_genre (
-        movie_id INTEGER REFERENCES movie(id_tmdb) ON DELETE CASCADE,
-        genre_id INTEGER REFERENCES genre(id_tmdb) ON DELETE CASCADE,
+        movie_id INTEGER NOT NULL REFERENCES movie(id_tmdb) ON DELETE CASCADE,
+        genre_id INTEGER NOT NULL REFERENCES genre(id_tmdb) ON DELETE CASCADE,
         PRIMARY KEY (movie_id, genre_id)
       );`);
 
     db.exec(`CREATE TABLE IF NOT EXISTS movie_country (
-        movie_id INTEGER REFERENCES movie(id_tmdb) ON DELETE CASCADE,
-        country_iso TEXT REFERENCES country(iso_code) ON DELETE CASCADE,
+        movie_id INTEGER NOT NULL REFERENCES movie(id_tmdb) ON DELETE CASCADE,
+        country_iso TEXT NOT NULL REFERENCES country(iso_code) ON DELETE CASCADE,
         PRIMARY KEY (movie_id, country_iso)
       );`);
 
