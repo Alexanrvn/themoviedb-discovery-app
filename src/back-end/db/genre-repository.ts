@@ -6,7 +6,10 @@ export interface Genre {
 }
 
 export class GenreRepository {
-  constructor(private db: DatabaseSync) {
+  private readonly db: DatabaseSync;
+
+  constructor(db: DatabaseSync) {
+    this.db = db;
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS genres (
         id INTEGER PRIMARY KEY,
@@ -22,7 +25,10 @@ export class GenreRepository {
 
   findAll(): Genre[] {
     const stmt = this.db.prepare('SELECT id, name FROM genres ORDER BY id ASC');
-    return stmt.all() as Genre[];
+    return stmt.all().map((row): Genre => ({
+      id: row.id as number,
+      name: row.name as string,
+    }));
   }
 
   upsertAll(genres: Iterable<Genre>): void {
