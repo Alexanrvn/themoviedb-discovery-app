@@ -18,6 +18,17 @@ Les paramètres par défaut sont la langue `fr-FR`, la région `FR` et la premi�
 - npm.
 - Un jeton d'accès à l'API TMDB. Vous pouvez en obtenir un depuis les paramètres de votre compte TMDB, dans la section API.
 
+## Commandes d'import et de nettoyage des genres
+
+- Importer des genres :
+  node src/back-end/backend-cli.ts add-genres ./data/genres.csv`
+
+- Importer avec une base spécifique :
+  node src/back-end/backend-cli.ts --path ./data/custom-movies.sqlite add-genres ./data/genres.csv`
+
+- Supprimer les genres inutilisés :
+  node src/back-end/backend-cli.ts clean-genres`
+
 ## Installation et démarrage
 
 1. Installez les dépendances :
