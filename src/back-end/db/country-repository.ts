@@ -1,3 +1,4 @@
+// src/back-end/db/country-repository.ts
 import { DatabaseSync } from 'node:sqlite';
 
 export interface Country {
@@ -11,25 +12,25 @@ export class CountryRepository {
   constructor(db: DatabaseSync) {
     this.db = db;
     this.db.exec(`
-      CREATE TABLE IF NOT EXISTS countries (
-        code TEXT PRIMARY KEY,
+      CREATE TABLE IF NOT EXISTS country (
+        iso_code TEXT PRIMARY KEY,
         name TEXT NOT NULL
       )
     `);
   }
 
-  findAll(): Country[] {
-    const stmt = this.db.prepare(
-      'SELECT code, name FROM countries ORDER BY code ASC',
-    );
-    return stmt.all() as unknown as Country[];
-  }
-
   findByCode(code: string): Country | undefined {
     const stmt = this.db.prepare(
-      'SELECT code, name FROM countries WHERE code = ?',
+      'SELECT iso_code AS code, name FROM country WHERE iso_code = ?',
     );
     return stmt.get(code) as Country | undefined;
+  }
+
+  findAll(): Country[] {
+    const stmt = this.db.prepare(
+      'SELECT iso_code AS code, name FROM country ORDER BY iso_code ASC',
+    );
+    return stmt.all() as unknown as Country[];
   }
 
   upsertAll(countries: Iterable<Country>): void {
@@ -42,9 +43,9 @@ export class CountryRepository {
           this.db.exec('BEGIN IMMEDIATE');
           transactionStarted = true;
           stmt = this.db.prepare(`
-            INSERT INTO countries (code, name)
+            INSERT INTO country (iso_code, name)
             VALUES (?, ?)
-            ON CONFLICT(code) DO UPDATE SET name = excluded.name
+            ON CONFLICT(iso_code) DO UPDATE SET name = excluded.name
           `);
         }
 
@@ -67,5 +68,23 @@ export class CountryRepository {
       }
       throw error;
     }
+  }
+
+  deleteUnusedCountries(): number {
+    const hasMovieCountry = this.db
+      .prepare(
+        "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'movie_country'",
+      )
+      .get();
+
+    const stmt = hasMovieCountry
+      ? this.db.prepare(`
+          DELETE FROM country
+          WHERE iso_code NOT IN (SELECT DISTINCT country_iso FROM movie_country)
+        `)
+      : this.db.prepare('DELETE FROM country');
+
+    const result = stmt.run();
+    return Number(result.changes);
   }
 }

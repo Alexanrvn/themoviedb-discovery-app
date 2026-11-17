@@ -29,6 +29,18 @@ Les paramètres par défaut sont la langue `fr-FR`, la région `FR` et la premi�
 - Supprimer les genres inutilisés :
   node src/back-end/backend-cli.ts clean-genres`
 
+## Commandes d'import et de nettoyage des pays
+
+- Importer ou actualiser des pays depuis un CSV :
+  `node src/back-end/backend-cli.ts add-countries ./data/countries.csv`
+
+- Importer dans une base spécifique :
+  `node src/back-end/backend-cli.ts --path ./data/custom-movies.sqlite add-countries ./data/countries.csv`
+
+- Supprimer les pays inutilisés :
+  `node src/back-end/backend-cli.ts clean-countries`
+  `node src/back-end/backend-cli.ts --path ./data/custom-movies.sqlite clean-countries`
+
 ## Installation et démarrage
 
 1. Installez les dépendances :

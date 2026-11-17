@@ -1,5 +1,5 @@
 import { parse } from 'csv-parse/sync';
-import { Genre } from '../db/genre-repository';
+import type { Genre } from '../db/genre-repository';
 
 export function parseGenresCsv(fileContent: string): Genre[] {
   // Parsing brut avec prise en charge du BOM UTF-8 et des lignes vides
